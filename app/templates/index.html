@@ -1,199 +1,40 @@
-<!doctype html>
+<!-- templates/home.html -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Selection</title>
     <link rel="stylesheet" href="/static/css/styles.css">
-    
-    <!-- jQuery debe cargarse antes que Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Carga de scripts personalizados -->
-    <script src="/static/js/scripts.js" defer></script>
-    
-    <title>Azure Cost Estimator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="mt-5">Azure Cost Estimator</h1>
-        <form method="POST" class="mt-3" id="cost-estimate-form">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-section">
-                        <div class="form-section-title">Azure OpenAI Estimation</div>
-                        <div class="form-group">
-                            <label for="num_users">Number of Potential Users</label>
-                            <input type="number" class="form-control" id="num_users" name="num_users" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="interactions_per_user">Number of Interactions per User</label>
-                            <input type="number" class="form-control" id="interactions_per_user" name="interactions_per_user" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tokens_per_interaction">Estimated Tokens per Interaction</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="tokens_per_interaction" name="tokens_per_interaction" required>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tokenCalculatorModal" id="calculateTokensButton">Calculate Tokens</button>
-                                </div>
-                            </div>
-                            <small class="form-text text-muted">Example: a prompt of 150 tokens and a response of 250 tokens equals 400 tokens per interaction.</small>
-                        </div>
-                    </div>
-                    <div class="form-section">
-                        <div class="form-section-title">Azure API Management</div>
-                        <div class="form-group">
-                            <label for="api_management_sku">Azure API Management SKU</label>
-                            <select class="form-control" id="api_management_sku" name="api_management_sku" required>
-                                <option value="Basic">Basic</option>
-                                <option value="Standard">Standard</option>
-                                <option value="Premium">Premium</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-section">
-                        <div class="form-section-title">Azure Private Endpoints & DNS Zones</div>
-                        <div class="form-group">
-                            <label for="num_endpoints">Number of Private Endpoints</label>
-                            <input type="number" class="form-control" id="num_endpoints" name="num_endpoints" value="3" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="num_dns_zones">Number of Private DNS Zones</label>
-                            <input type="number" class="form-control" id="num_dns_zones" name="num_dns_zones" value="1" required>
-                            <small class="form-text text-muted">Specify the number of private DNS zones needed.</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-section">
-                        <div class="form-section-title">Azure AI Search</div>
-                        <div class="form-group">
-                            <label for="ai_search_sku">Azure AI Search SKU</label>
-                            <select class="form-control" id="ai_search_sku" name="ai_search_sku" required>
-                                <option value="Standard S1">Standard S1</option>
-                                <option value="Standard S2">Standard S2</option>
-                                <option value="Standard S3">Standard S3</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-section">
-                        <div class="form-section-title">Azure CosmosDB</div>
-                        <div class="form-group">
-                            <label for="cosmosdb_ru">Azure CosmosDB - Request Units (RU/s)</label>
-                            <input type="number" class="form-control" id="cosmosdb_ru" name="cosmosdb_ru" required>
-                            <small class="form-text text-muted">Specify the number of Request Units per second for Azure CosmosDB.</small>
-                        </div>
-                    </div>
-                    <div class="form-section">
-                        <div class="form-section-title">Azure Functions</div>
-                        <div class="form-group">
-                            <label for="functions_executions">Azure Functions - Number of Executions per Month</label>
-                            <input type="number" class="form-control" id="functions_executions" name="functions_executions" required>
-                            <small class="form-text text-muted">Specify the number of function executions expected per month.</small>
-                        </div>
-                    </div>
-                    <div class="form-section">
-                        <div class="form-section-title">Azure Key Vault</div>
-                        <div class="form-group">
-                            <label for="key_vault_transactions">Azure Key Vault - Number of Transactions</label>
-                            <input type="number" class="form-control" id="key_vault_transactions" name="key_vault_transactions" required>
-                            <small class="form-text text-muted">Specify the number of transactions for Azure Key Vault per month.</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    <div class="form-section">
-                        <div class="form-section-title">General Configuration</div>
-                        <div class="form-group">
-                            <label for="region">Region</label>
-                            <select class="form-control" id="region" name="region" required>
-                                <option value="West Europe">West Europe</option>
-                                <option value="Sweden Central">Sweden Central</option>
-                                <option value="Italy North">Italy North</option>
-                                <option value="Spain Central">Spain Central</option>
-                                <option value="France Central">France Central</option>
-                            </select>
-                        </div>
+    <div class="container text-center mt-5">
+        <h1 class="mb-4">Select Your Form Type</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-5 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Basic Form</h2>
+                        <p class="card-text">Fill out a few simple fields and let us handle the rest.</p>
+                        <a href="/basic-form" class="btn btn-primary">Go to Basic Form</a>
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Calculate Estimated Cost</button>
-        </form>
-
-        <!-- Token Calculator Modal -->
-        <div class="modal fade" id="tokenCalculatorModal" tabindex="-1" role="dialog" aria-labelledby="tokenCalculatorModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="tokenCalculatorModalLabel">Token Calculator</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="exampleText">Enter Example Text</label>
-                            <textarea class="form-control" id="exampleText" rows="5" placeholder="Enter your text here..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="modelSelection">Select Model</label>
-                            <select class="form-control" id="modelSelection">
-                                <option value="gpt3.5-gpt4">GPT-3.5 & GPT-4</option>
-                                <option value="gpt4o">GPT-4o/GPT4o-Mini</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <button type="button" class="btn btn-primary" id="calculateTokensButtonModal">Calculate Tokens</button>
-                        </div>
-                        <div class="form-group">
-                            <label for="calculatedTokens">Calculated Tokens</label>
-                            <input type="text" class="form-control" id="calculatedTokens" readonly>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" id="closeModalButton" data-dismiss="modal">Close</button>
+            <div class="col-md-5 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Advanced Form</h2>
+                        <p class="card-text">Provide detailed information for a customized experience.</p>
+                        <a href="/advanced-form" class="btn btn-secondary">Go to Advanced Form</a>
                     </div>
                 </div>
             </div>
         </div>
-
-        {% if total_cost is not none %}
-        <div class="mt-5">
-            <h2>Monthly Estimated Cost</h2>
-            <table class="table mt-3">
-                <thead>
-                    <tr>
-                        <th>Service</th>
-                        <th>Unit Price (EUR)</th>
-                        <th>Total Units</th>
-                        <th>Total Cost (EUR)</th>
-                        <th>Selected Region</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cost_breakdown %}
-                    <tr>
-                        <td>{{ item['Service'] }}</td>
-                        <td>{{ '%.4f'|format(item['Unit Price (EUR)']) }}</td>
-                        <td>{{ item['Total Units'] }}</td>
-                        <td>{{ '%.4f'|format(item['Total Cost (EUR)']) }}</td>
-                        <td>{{ item['Selected Region'] }}</td>
-                    </tr>
-                    {% endfor %}
-                    <tr class="font-weight-bold">
-                        <td colspan="3">Total Cost</td>
-                        <td colspan="2">{{ '%.4f'|format(total_cost) }} EUR</td>
-                    </tr>
-                </tbody>
-            </table>
-            <form method="POST" action="/download">
-                <input type="hidden" name="cost_breakdown" value="{{ cost_breakdown }}">
-                <button type="submit" class="btn btn-success">Download Cost Breakdown in Excel</button>
-            </form>
-        </div>
-        {% endif %}
     </div>
+
+    <script src="/static/js/scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
