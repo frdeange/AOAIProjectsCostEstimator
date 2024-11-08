@@ -49,12 +49,19 @@ def upload_data_to_cosmosdb():
                 # Extract service name from filename (e.g., "azure_app_service.json" -> "azure_app_service")
                 service_name = filename.replace(".json", "")
 
+                # Check if a document with the same service name and current date already exists
+                query = f"SELECT * FROM c WHERE c.serviceName = '{service_name}' AND c.date = '{current_date}'"
+                items = list(container.query_items(query=query, enable_cross_partition_query=True))
+                if items:
+                    print(f"Document for service '{service_name}' with date '{current_date}' already exists. Skipping upload.")
+                    continue
+
                 # Load the JSON data from the file
                 with open(filepath, "r") as json_file:
                     service_data = json.load(json_file)
 
                 # Create the document to upload
-                document_id = f"{service_name}_{current_date}"
+                document_id = f"{service_name}"
                 document = {
                     "id": document_id,
                     "serviceName": service_name,

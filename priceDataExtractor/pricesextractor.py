@@ -7,7 +7,7 @@ data_dir = "azure_prices_data"
 os.makedirs(data_dir, exist_ok=True)
 
 # Load endpoints from an external file
-endpoints_file = "endpoints.txt"
+endpoints_file = "./priceDataExtractor/endpoints.txt"
 endpoints = {}
 
 with open(endpoints_file, "r") as file:
@@ -39,8 +39,8 @@ def extract_data():
         fetch_and_save_data(service_name, url)
         time.sleep(1)  # Wait one second between requests to avoid overloading the API
 
-# Function to combine all JSON files into one
-def combine_json():
+# Function to combine all JSON files into one (disabled for now)
+"""def combine_json():
     combined_data = []
     for filename in os.listdir(data_dir):
         if filename.endswith(".json"):
@@ -51,10 +51,11 @@ def combine_json():
     combined_filename = os.path.join(data_dir, "combined_azure_prices.json")
     with open(combined_filename, "w") as combined_file:
         json.dump(combined_data, combined_file, indent=4)
-    print(f"Combined data saved in {combined_filename}")
+    print(f"Combined data saved in {combined_filename}")"""
 
 if __name__ == "__main__":
     # Extract data from endpoints
     extract_data()
+    
     # Combine all JSON files into one
-    combine_json()
+    # combine_json()

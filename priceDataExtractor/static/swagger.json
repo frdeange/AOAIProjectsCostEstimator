@@ -1,52 +1,91 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "description": "This is the Azure Prices API",
-      "version": "1.0.0",
-      "title": "Azure Prices API"
-    },
-    "host": "localhost:5000",
-    "basePath": "/",
-    "schemes": [
-      "http"
-    ],
-    "paths": {
-      "/prices": {
-        "get": {
-          "summary": "Get Azure prices",
-          "description": "Returns Azure pricing information",
-          "parameters": [
-            {
-              "name": "serviceName",
-              "in": "query",
-              "required": false,
-              "type": "string",
-              "description": "The name of the Azure service to filter by"
-            },
-            {
-              "name": "region",
-              "in": "query",
-              "required": false,
-              "type": "string",
-              "description": "The region to filter by"
+  "swagger": "2.0",
+  "info": {
+    "description": "This is the Azure Prices API",
+    "version": "1.0.0",
+    "title": "Azure Prices API"
+  },
+  "host": "localhost:5000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/prices": {
+      "get": {
+        "summary": "Get Azure prices",
+        "description": "Returns Azure pricing information",
+        "parameters": [
+          {
+            "name": "serviceName",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "The name of the Azure service to filter by"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "The region to filter by"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful operation",
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "summary": "Get a list of all available Azure services",
+        "responses": {
+          "200": {
+            "description": "A list of available services",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
-            },
-            "500": {
-              "description": "Internal server error"
+            }
+          }
+        }
+      }
+    },
+    "/regions": {
+      "get": {
+        "summary": "Get a list of all available regions",
+        "responses": {
+          "200": {
+            "description": "A list of available regions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         }
       }
     }
   }
-  
+}
