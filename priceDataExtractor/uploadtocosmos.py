@@ -1,23 +1,42 @@
 from datetime import datetime
 import os
 import json
-from azure.cosmos import CosmosClient, PartitionKey, exceptions
+import urllib3
+import azure.cosmos.cosmos_client as cosmos_client
+import azure.cosmos.exceptions as exceptions
+from azure.cosmos import PartitionKey
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
+
+
+# Ruta al certificado descargado del emulador CosmosDB
+cert_path = "cosmos_emulator_cert.pem"
 
 # CosmosDB connection configuration
 COSMOSDB_URI = os.getenv("AZURE_COSMOSDB_URI", "YOUR_COSMOSDB_URI")
 COSMOSDB_KEY = os.getenv("AZURE_COSMOSDB_KEY", "YOUR_COSMOSDB_KEY")
 COSMOSDB_DATABASE = os.getenv("AZURE_COSMOSDB_DATABASE", "AzurePricesDB")
 COSMOSDB_CONTAINER = os.getenv("AZURE_COSMOSDB_CONTAINER", "Prices")
+IS_LOCAL = os.getenv("ENVIROMENT") == "local"
 
-# Initialize CosmosDB client
-client = CosmosClient(COSMOSDB_URI, credential=COSMOSDB_KEY)
+if IS_LOCAL:
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    client = cosmos_client.CosmosClient(
+    url="https://cosmosdb:8081",
+    credential=(
+        "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGG"
+        "yPMbIZnqyMsEcaGQy67XIw/Jw=="
+    ),
+    connection_verify=False
+)
+else:
+    # Initialize CosmosDB client if running in Azure
+    client = cosmos_client.CosmosClient(COSMOSDB_URI, {'masterKey': COSMOSDB_KEY})
 
 # Paths
-DATA_DIR = "priceDataExtractor/azure_prices_data"
+DATA_DIR = "./priceDataExtractor/azure_prices_data"
 
 # Create database and container if they do not exist
 def setup_cosmosdb():

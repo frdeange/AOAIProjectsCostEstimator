@@ -1,66 +1,344 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is the Azure Prices API",
+    "description": "This is the API documentation for the Azure Prices API.",
     "version": "1.0.0",
     "title": "Azure Prices API"
   },
   "host": "localhost:5000",
   "basePath": "/",
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/prices": {
       "get": {
         "summary": "Get Azure prices",
-        "description": "Returns Azure pricing information",
+        "description": "Retrieve all Azure prices, optionally filtered by service name and region.",
         "parameters": [
           {
             "name": "serviceName",
             "in": "query",
-            "required": false,
             "type": "string",
-            "description": "The name of the Azure service to filter by"
+            "required": false,
+            "description": "The name of the Azure service to filter by."
           },
           {
             "name": "region",
             "in": "query",
-            "required": false,
             "type": "string",
-            "description": "The region to filter by"
+            "required": false,
+            "description": "The region to filter by."
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "A list of prices",
             "schema": {
               "type": "array",
               "items": {
                 "type": "object"
               }
             }
-          },
-          "500": {
-            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/prices/api_management": {
+      "get": {
+        "summary": "Get API Management service prices",
+        "description": "Retrieve pricing details for Azure API Management, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for API Management service",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_ai_search": {
+      "get": {
+        "summary": "Get Azure AI Search service prices",
+        "description": "Retrieve pricing details for Azure AI Search, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure AI Search service",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_app_service": {
+      "get": {
+        "summary": "Get Azure App Service prices",
+        "description": "Retrieve pricing details for Azure App Service, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure App Service",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_cosmosdb": {
+      "get": {
+        "summary": "Get Azure CosmosDB prices",
+        "description": "Retrieve pricing details for Azure CosmosDB, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure CosmosDB",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_dns": {
+      "get": {
+        "summary": "Get Azure DNS service prices",
+        "description": "Retrieve pricing details for Azure DNS, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure DNS",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_document_intelligence": {
+      "get": {
+        "summary": "Get Azure Document Intelligence prices",
+        "description": "Retrieve pricing details for Azure Document Intelligence, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure Document Intelligence",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_functions": {
+      "get": {
+        "summary": "Get Azure Functions prices",
+        "description": "Retrieve pricing details for Azure Functions, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure Functions",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_keyvault": {
+      "get": {
+        "summary": "Get Azure Key Vault prices",
+        "description": "Retrieve pricing details for Azure Key Vault, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure Key Vault",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_monitor": {
+      "get": {
+        "summary": "Get Azure Monitor prices",
+        "description": "Retrieve pricing details for Azure Monitor, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure Monitor",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/azure_openai": {
+      "get": {
+        "summary": "Get Azure OpenAI prices",
+        "description": "Retrieve pricing details for Azure OpenAI, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Azure OpenAI",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/prices/blob_storage": {
+      "get": {
+        "summary": "Get Blob Storage prices",
+        "description": "Retrieve pricing details for Azure Blob Storage, optionally filtered by region.",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The region to filter by."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pricing details for Blob Storage",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }
     },
     "/services": {
       "get": {
-        "summary": "Get a list of all available Azure services",
+        "summary": "Get list of services",
+        "description": "Retrieve a list of all available Azure services.",
         "responses": {
           "200": {
             "description": "A list of available services",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
               }
             }
           }
@@ -69,18 +347,15 @@
     },
     "/regions": {
       "get": {
-        "summary": "Get a list of all available regions",
+        "summary": "Get list of regions",
+        "description": "Retrieve a list of all available Azure regions.",
         "responses": {
           "200": {
             "description": "A list of available regions",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
               }
             }
           }

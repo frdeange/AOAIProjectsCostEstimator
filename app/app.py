@@ -1,65 +1,53 @@
-from flask import Flask, render_template, request, send_file, jsonify
-import requests
-import pandas as pd
-import io
-import time
-import tiktoken
+from flask import Flask, render_template, request, jsonify
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../priceDataExtractor')))
+import pricesapi  # Tu módulo para conectar a la API de precios
 
 app = Flask(__name__)
 
-# Route for the home page
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
-# Route for the basic form
 @app.route('/basic-form')
 def basic_form():
-    return render_template('basic_form.html')
+    return render_template('basic-form.html')
 
-# Route for the advanced form
 @app.route('/advanced-form')
 def advanced_form():
-    return render_template('advanced_form.html', total_cost=None, cost_breakdown=[])
+    return render_template('advanced-form.html')
 
-@app.route('/calculate_tokens', methods=['POST'])
-def calculate_tokens():
-    data = request.get_json()
-    text = data.get('text')
-    model = data.get('model')
+@app.route('/calculate-pricing', methods=['POST'])
+def calculate_pricing():
+    form_data = request.json
+    # Datos recibidos del formulario
+    num_users = form_data.get('numUsers')
+    num_interactions = form_data.get('numInteractions')
+    model = form_data.get('genAIModel')
+    preferred_region = form_data.get('preferredRegion')
+    num_docs_setup = form_data.get('numDocsSetup')
+    num_docs_monthly = form_data.get('numDocsMonthly')
 
-    if not text or not model:
-        return jsonify({'error': 'Invalid input'}), 400
+    # Obtén los precios desde la API de Azure
+    price_per_thousand_tokens = pricesapi.get_prices(model, preferred_region)
+    if price_per_thousand_tokens is None:
+        return jsonify({'error': 'Unable to fetch pricing information'}), 500
 
-    try:
-        # Determinar el encoding en función del modelo seleccionado
-        if model == 'gpt3.5-gpt4':
-            encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
-        elif model == 'gpt4o':
-            encoding = tiktoken.encoding_for_model("gpt-4o")
-        else:
-            return jsonify({'error': 'Unsupported model'}), 400
+    # Realiza cálculos (equivalente a lo que haces en Excel)
+    total_tokens_setup = num_docs_setup * 35 * 300 * 1.33 if num_docs_setup else 0
+    total_tokens_monthly = num_docs_monthly * 35 * 300 * 1.33 if num_docs_monthly else 0
+    total_tokens = total_tokens_setup + total_tokens_monthly
+    cost = (total_tokens / 1000) * price_per_thousand_tokens
 
-        # Calcular los tokens del texto
-        tokens = len(encoding.encode(text))
+    result = {
+        "model": model,
+        "region": preferred_region,
+        "total_tokens": total_tokens,
+        "cost": round(cost, 2)
+    }
 
-        return jsonify({'tokens': tokens})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/download', methods=['POST'])
-def download():
-    # Get cost breakdown data from hidden form field
-    cost_breakdown = request.form.get('cost_breakdown')
-    if cost_breakdown:
-        cost_breakdown = eval(cost_breakdown)  # Convert string to list of dictionaries
-        df = pd.DataFrame(cost_breakdown)
-        # Save to an Excel file in memory
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            df.to_excel(writer, index=False, sheet_name='Cost Breakdown')
-        output.seek(0)
-        return send_file(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as_attachment=True, download_name='cost_breakdown.xlsx')
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

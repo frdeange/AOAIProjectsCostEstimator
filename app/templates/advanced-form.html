@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../static/css/styles.css">
+  <title>Advanced Pricing Form</title>
+</head>
+<body>
+  <img src="https://via.placeholder.com/100x100?text=Logo" alt="Logo" class="logo">
+  <div class="form-container" id="formContainer">
+    <h1>Advanced Pricing Tool</h1>
+    <div class="progress-bar">
+      <div id="progress1" class="active"></div>
+      <div id="progress2"></div>
+      <div id="progress3"></div>
+      <div id="progress4"></div>
+    </div>
+    <form id="multiStepForm">
+      <!-- Step 1 -->
+      <div class="step active" id="step1">
+        <h2>Related to GenAI Use</h2>
+        <label for="numUsers">Number of Users:<i class="fas fa-info-circle info-icon" title="The number of users who will be interacting with the GenAI model." onclick="showTooltip(this)"></i></label>
+        <input type="number" id="numUsers" name="numUsers" required>
+        <label for="numInteractions">Number of Interactions:<i class="fas fa-info-circle info-icon" title="The expected number of interactions with the GenAI model per month." onclick="showTooltip(this)"></i></label>
+        <input type="number" id="numInteractions" name="numInteractions" required>
+        <label for="genAIModel">GenAI Model to use:<i class="fas fa-info-circle info-icon" title="Select the version of GenAI model you plan to use for this project." onclick="showTooltip(this)"></i></label>
+        <select id="genAIModel" name="genAIModel" required>
+          <option value="">Select a model</option>
+          <option value="gpt-3.5">GPT-3.5</option>
+          <option value="gpt-4">GPT-4</option>
+          <option value="gpt-4turbo">GPT-4Turbo</option>
+          <option value="gpt-4o">GPT-4o</option>
+        </select>
+        <h2>Preferred Region</h2>
+        <label for="preferredRegion">Preferred Region:<i class="fas fa-info-circle info-icon" title="Select your preferred Azure region for deploying the GenAI model." onclick="showTooltip(this)"></i></label>
+        <select id="preferredRegion" name="preferredRegion" required>
+          <option value="">Select a region</option>
+          <option value="france-central">France Central</option>
+          <option value="italy-north">Italy North</option>
+          <option value="spain-central">Spain Central</option>
+          <option value="sweden-central">Sweden Central</option>
+          <option value="west-europe">West Europe</option>
+        </select>
+        <h2>Advanced Options</h2>
+        <label for="customScaling">Custom Scaling Requirements:<i class="fas fa-info-circle info-icon" title="Specify any custom scaling requirements for your project." onclick="showTooltip(this)"></i></label>
+        <input type="text" id="customScaling" name="customScaling">
+        <label for="securityCompliance">Security and Compliance Requirements:<i class="fas fa-info-circle info-icon" title="Describe any specific security or compliance requirements." onclick="showTooltip(this)"></i></label>
+        <input type="text" id="securityCompliance" name="securityCompliance">
+      </div>
+      <!-- Step 2 -->
+      <div class="step" id="step2">
+        <h2>Retrieve Augmented Generation (RAG)</h2>
+        <label for="ragRequired">Does your project need RAG?<i class="fas fa-info-circle info-icon" title="Check this box if your project requires retrieval-augmented generation." onclick="showTooltip(this)"></i></label>
+        <input type="checkbox" id="ragRequired" name="ragRequired" onchange="toggleRAGFields()">
+        <div class="conditional-fields" id="ragFields">
+          <label for="numDocsSetup">Number of Documents to load on setup:<i class="fas fa-info-circle info-icon" title="The number of documents you plan to upload during initial setup." onclick="showTooltip(this)"></i></label>
+          <input type="number" id="numDocsSetup" name="numDocsSetup">
+          <label for="numDocsMonthly">Number of Monthly Document changes:<i class="fas fa-info-circle info-icon" title="The number of documents you expect to change on a monthly basis." onclick="showTooltip(this)"></i></label>
+          <input type="number" id="numDocsMonthly" name="numDocsMonthly">
+        </div>
+        <h2>Infrastructure Requirements</h2>
+        <label for="infrastructure">Choose your infrastructure:<i class="fas fa-info-circle info-icon" title="Select whether this is a proof of concept or a functional project." onclick="showTooltip(this)"></i></label>
+        <input type="radio" id="poc" name="infrastructure" value="poc" required>
+        <label for="poc" style="display: inline; font-weight: normal;">Proof of Concept (PoC)</label>
+        <input type="radio" id="functional" name="infrastructure" value="functional" required>
+        <label for="functional" style="display: inline; font-weight: normal;">Functional Project</label>
+      </div>
+      <!-- Step 3 -->
+      <div class="step" id="step3">
+        <h2>Review & Submit</h2>
+        <p>Please review your details before submission:</p>
+        <div id="review"></div>
+      </div>
+      <!-- Step 4 -->
+      <div class="step" id="step4">
+        <h2>Calculation Results</h2>
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Service Description</th>
+              <th>Units</th>
+              <th>Unitary Price</th>
+              <th>Total Service</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <!-- Rows will be dynamically inserted here -->
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+              <td id="totalPrice">$0.00</td>
+            </tr>
+          </tfoot>
+        </table>
+        <button type="button" class="download-button" onclick="downloadExcel()">Download as Excel</button>
+      </div>
+      <!-- Navigation Buttons -->
+      <div class="step-buttons">
+        <button type="button" id="prevBtn" onclick="changeStep(-1)">Previous</button>
+        <button type="button" id="nextBtn" onclick="changeStep(1)">Next</button>
+      </div>
+    </form>
+  </div>
+  <script src="../static/js/scripts.js"></script>
+</body>
+</html>

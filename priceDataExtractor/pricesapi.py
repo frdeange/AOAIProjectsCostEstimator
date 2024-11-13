@@ -15,15 +15,27 @@ COSMOSDB_URI = os.getenv("AZURE_COSMOSDB_URI", "YOUR_COSMOSDB_URI")
 COSMOSDB_KEY = os.getenv("AZURE_COSMOSDB_KEY", "YOUR_COSMOSDB_KEY")
 COSMOSDB_DATABASE = os.getenv("AZURE_COSMOSDB_DATABASE", "AzurePricesDB")
 COSMOSDB_CONTAINER = os.getenv("AZURE_COSMOSDB_CONTAINER", "Prices")
+IS_LOCAL = os.getenv("ENVIROMENT") == "local"
 
-# Initialize CosmosDB client
-client = cosmos_client.CosmosClient(COSMOSDB_URI, {'masterKey': COSMOSDB_KEY})
+# Initialize CosmosDB client If running locally, use the local CosmosDB Emulator
+if IS_LOCAL:
+    client = cosmos_client.CosmosClient(
+        url="https://cosmosdb:8081",
+        credential=(
+            "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGG"
+            "yPMbIZnqyMsEcaGQy67XIw/Jw=="
+        ),
+        connection_verify=False
+    )
+else:
+    # Initialize CosmosDB client if running in Azure
+    client = cosmos_client.CosmosClient(COSMOSDB_URI, {'masterKey': COSMOSDB_KEY})
 
 # Flask API setup
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-### Swagger UI setup ###
+# Swagger UI setup
 SWAGGER_URL = '/swagger'
 API_URL = '/static/swagger.json'
 SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
@@ -35,10 +47,46 @@ SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
 )
 app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
 
+# Define a function to get a specific service's pricing with optional region filter
+def get_service_pricing(service_name, region=None):
+    try:
+        # Get reference to the container
+        database = client.get_database_client(COSMOSDB_DATABASE)
+        container = database.get_container_client(COSMOSDB_CONTAINER)
+
+        # Base query to get specific service document
+        query = f"SELECT * FROM c WHERE c.serviceName = '{service_name}'"
+
+        logging.debug(f"Executing query: {query}")
+        # Execute the query
+        documents = list(container.query_items(
+            query=query,
+            enable_cross_partition_query=True
+        ))
+
+        if not documents:
+            logging.warning(f"No documents found for service: {service_name}")
+            return {"error": f"No data found for service: {service_name}"}, 404
+
+        # Assuming there is only one document per service
+        service_data = documents[0]["data"]["Items"]
+
+        # Apply region filter if provided
+        if region:
+            service_data = [
+                item for item in service_data
+                if item.get("armRegionName", "").lower() == region.lower()
+            ]
+
+        return service_data
+
+    except exceptions.CosmosHttpResponseError as e:
+        logging.error(f"CosmosDB error: {e}")
+        return {"error": str(e)}, 500
+
+# Endpoint to get all prices
 @app.route('/prices', methods=['GET'])
 def get_prices():
-    def normalize_service_name_for_query(service_name):
-        return service_name.replace(' ', '_')
     """
     Get Azure prices
     ---
@@ -89,7 +137,7 @@ def get_prices():
             if "data" in doc and "Items" in doc["data"]:
                 for item in doc["data"]["Items"]:
                     # Apply filters if provided
-                    if service_name and normalize_service_name_for_query(service_name.lower()) != item.get("serviceName", "").replace(' ', '_').lower():
+                    if service_name and service_name.lower() != item.get("serviceName", "").lower():
                         continue
                     if region and region.lower() != item.get("armRegionName", "").lower():
                         continue
@@ -102,12 +150,65 @@ def get_prices():
         logging.error(f"CosmosDB error: {e}")
         return jsonify({"error": str(e)}), 500
 
+# Endpoint for each Azure service with optional region filter
+@app.route('/prices/api_management', methods=['GET'])
+def get_api_management_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("api_management", region))
+
+@app.route('/prices/azure_ai_search', methods=['GET'])
+def get_azure_ai_search_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_ai_search", region))
+
+@app.route('/prices/azure_app_service', methods=['GET'])
+def get_azure_app_service_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_app_service", region))
+
+@app.route('/prices/azure_cosmosdb', methods=['GET'])
+def get_azure_cosmosdb_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_cosmosdb", region))
+
+@app.route('/prices/azure_dns', methods=['GET'])
+def get_azure_dns_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_dns", region))
+
+@app.route('/prices/azure_document_intelligence', methods=['GET'])
+def get_azure_document_intelligence_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_document_intelligence", region))
+
+@app.route('/prices/azure_functions', methods=['GET'])
+def get_azure_functions_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_functions", region))
+
+@app.route('/prices/azure_keyvault', methods=['GET'])
+def get_azure_keyvault_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_keyvault", region))
+
+@app.route('/prices/azure_monitor', methods=['GET'])
+def get_azure_monitor_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_monitor", region))
+
+@app.route('/prices/azure_openai', methods=['GET'])
+def get_azure_openai_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("azure_openai", region))
+
+@app.route('/prices/blob_storage', methods=['GET'])
+def get_blob_storage_prices():
+    region = request.args.get('region')
+    return jsonify(get_service_pricing("blob_storage", region))
 
 # Endpoint to list all available services
 @app.route('/services', methods=['GET'])
 def get_services():
-    def normalize_service_name(service_name):
-        return service_name.replace('_', ' ')
     """
     Get a list of all available Azure services
     ---
@@ -134,8 +235,8 @@ def get_services():
             enable_cross_partition_query=True
         ))
 
-        # Normalize service names to match the format used in `/prices`
-        services = [normalize_service_name(service) for service in services]
+        # Normalize service names to match the format used in /prices
+        services = [service.lower() for service in services]
 
         if not services:
             logging.warning("No services found in the container.")
@@ -146,7 +247,6 @@ def get_services():
     except exceptions.CosmosHttpResponseError as e:
         logging.error(f"CosmosDB error: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 # Endpoint to list all available regions
 @app.route('/regions', methods=['GET'])
